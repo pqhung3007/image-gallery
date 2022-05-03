@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { FaSearch } from 'react-icons/fa'
 import Photo from './Photo'
@@ -12,14 +11,21 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [photos, setPhotos] = useState([])
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
 
   const fetchImages = async () => {
     setLoading(true)
-    let url = `${mainUrl}${clientID}`
+    let url = `${mainUrl}${clientID}&page=${page}`
+
     try {
       const response = await fetch(url)
       const data = await response.json()
-      setPhotos(data);
+      setPhotos(prevPhotos => {
+        if (page === 1) {
+          return [...data]
+        }
+        return [...prevPhotos, ...data]
+      });
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -29,7 +35,20 @@ function App() {
 
   useEffect(() => {
     fetchImages()
+  }, [page])
+
+  useEffect(() => {
+    const event = window.addEventListener('scroll', () => {
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 3
+        && !loading) {
+        setPage(prevPage => prevPage + 1)
+        console.log('Reach bottom');
+      }
+    })
+    return () => window.removeEventListener('click', event)
+    // eslint-disable-next-line
   }, [])
+
 
   const handleChange = e => {
     setQuery(e.target.value)
