@@ -9,6 +9,7 @@ const Photo = ({
     portfolio_url,
     profile_image: { medium },
   },
+  description,
 }) => {
   return (
     <article className="photo">
@@ -17,6 +18,7 @@ const Photo = ({
         <div>
           <h4>{name}</h4>
           <p>{likes} likes</p>
+          <p>{description}</p>
         </div>
         <a href={portfolio_url} target="_blank" rel="noopener noreferrer">
           <img src={medium} alt={name} className="user-img" />

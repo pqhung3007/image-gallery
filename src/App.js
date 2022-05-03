@@ -15,16 +15,28 @@ function App() {
 
   const fetchImages = async () => {
     setLoading(true)
-    let url = `${mainUrl}${clientID}&page=${page}`
+    let url
+    // display searched image when there's keyword or default images otherwise
+    if (query) {
+      url = `${searchUrl}${clientID}&page=${page}&query=${query}`
+    } else {
+      url = `${mainUrl}${clientID}&page=${page}`
+    }
 
     try {
       const response = await fetch(url)
       const data = await response.json()
+
       setPhotos(prevPhotos => {
-        if (page === 1) {
-          return [...data]
+        // remove default images when at page 1
+        if (query && page === 1) {
+          return data.results
+        } else if (query) {
+          // console.log(`Found ${data.total} results`);
+          return [...prevPhotos, ...data.results]
+        } else {
+          return [...prevPhotos, ...data]
         }
-        return [...prevPhotos, ...data]
       });
       setLoading(false)
     } catch (error) {
@@ -35,14 +47,15 @@ function App() {
 
   useEffect(() => {
     fetchImages()
+    // eslint-disable-next-line
   }, [page])
 
   useEffect(() => {
     const event = window.addEventListener('scroll', () => {
+      // increment page when mouse hits the bottom
       if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 3
         && !loading) {
         setPage(prevPage => prevPage + 1)
-        console.log('Reach bottom');
       }
     })
     return () => window.removeEventListener('click', event)
@@ -56,6 +69,7 @@ function App() {
 
   const handleSubmit = e => {
     e.preventDefault()
+    fetchImages()
   }
 
   return (
