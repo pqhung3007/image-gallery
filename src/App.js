@@ -34,6 +34,8 @@ function App() {
         } else if (query) {
           // console.log(`Found ${data.total} results`);
           return [...prevPhotos, ...data.results]
+        } else if (page === 1) {
+          return [...data]
         } else {
           return [...prevPhotos, ...data]
         }
